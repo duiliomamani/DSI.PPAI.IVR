@@ -1,0 +1,24 @@
+﻿@using DSI.PPAI.IVR.Pages.Authentication
+@inherits LayoutComponentBase
+
+<div class="page d-flex">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <LoginDisplay />
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+
+        <footer class="footer mt-auto py-5 bg-transparent">
+            <div class="d-felx justify-content-center">
+                <small class="d-block mb-3 text-center text-muted ">&copy; @DateTime.Now.AddYears(-1).ToString("yyyy") - @DateTime.Now.ToString("yyyy")</small>
+            </div>
+        </footer>
+    </main>
+</div>
