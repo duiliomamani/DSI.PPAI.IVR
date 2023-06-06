@@ -18,24 +18,22 @@ namespace DSI.PPAI.IVR.Business
         private readonly NavigationManager _navigationManager;
         private readonly ContainerValues _containerValues;
 
-        public GestorLlamada(CategoriaLlamada categoriaLlamada,
-            OpcionLlamada opcionLlamada,
-            SubOpcionLlamada subOpcionLlamada,
-            Llamada llamada,
-            NavigationManager navigationManager,
-            ContainerValues containerValues)
+        public GestorLlamada(NavigationManager navigationManager, ContainerValues containerValues)
         {
-            _opcionLlamada = opcionLlamada;
-            _subOpcionLlamada = subOpcionLlamada;
-            _categoriaLlamada = categoriaLlamada;
-            _llamada = llamada;
             _estados = Estado.GetAllValues().ToList();
             _navigationManager = navigationManager;
             _containerValues = containerValues;
         }
 
-        public void comunicarseOP()
+        public void comunicarseOP(CategoriaLlamada categoriaLlamada,
+            OpcionLlamada opcionLlamada,
+            SubOpcionLlamada subOpcionLlamada,
+            Llamada llamada)
         {
+            _opcionLlamada = opcionLlamada;
+            _subOpcionLlamada = subOpcionLlamada;
+            _categoriaLlamada = categoriaLlamada;
+            _llamada = llamada;
 
             if (identificarOpcion())
             {
@@ -77,9 +75,23 @@ namespace DSI.PPAI.IVR.Business
         {
             return _estados.Where(x => x.esEnCurso()).First();
         }
-        private IList<string> buscarValidaciones()
+        private IList<Validacion> buscarValidaciones()
         {
             return _subOpcionLlamada.getValidacionesSubOpcion();
+        }
+
+        public Dictionary<string, bool> tomarRespuesta(Dictionary<Validacion, string> respuestas)
+        {
+            return validarDatos(respuestas);
+        }
+        private Dictionary<string, bool> validarDatos(Dictionary<Validacion, string> respuestas)
+        {
+            Dictionary<string, bool> validaciones = new Dictionary<string, bool>();
+            foreach (var r in respuestas)
+            {
+                validaciones.Add(r.Key.getDescripcion(), _llamada.validarDatos(r.Key, r.Value));
+            }
+            return validaciones;
         }
     }
 }

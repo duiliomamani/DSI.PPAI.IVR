@@ -1,7 +1,9 @@
-﻿@using DSI.PPAI.IVR.Pages.Home.Components
+﻿@using DSI.PPAI.IVR.Domain;
+@using DSI.PPAI.IVR.Pages.Home.Components
 @using Microsoft.AspNetCore.Components.Authorization
-@inject ContainerValues _containerValues;
+@using DSI.PPAI.IVR.Pages.CallOperator.Components;
 
+@inject ContainerValues _containerValues;
 
 @page "/operator/call"
 <AuthorizeView>
@@ -11,7 +13,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="card mb-4 shadow-sm">
-                            <img class="card-img-top w-75" src="/images/ivr_image_1.jpeg" alt="IVR-Background">
+                            @*<img class="card-img-top w-75" src="/images/ivr_image_1.jpeg" alt="IVR-Background">*@
                             <div class="card-body">
                                 <h4 class="card-title">
                                     Cliente: @datosLlamada
@@ -30,19 +32,19 @@
                                 <li class="list-group-item"> <b>Validaciones</b></li>
                                 @foreach (var v in datosValidaciones)
                                 {
-                                    <li class="list-group-item">@v</li>
+                                    <li class="list-group-item">@v.getDatosValidacion()</li>
                                 }
                             </ul>
                             <div class="card-footer">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <button type="button" class="btn btn-outline-dark">View</button>
-                                    <small class="text-muted">9 mins</small>
+                                    <button type="button" class="btn btn-outline-dark" @onclick="() =>solicitarRepuestaValidaciones()">Tomar datos</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <Modal_Component @ref="Modal" />
         </div>
     </Authorized>
     <NotAuthorized>
@@ -61,7 +63,9 @@
     [Parameter]
     public string nombreCategoria { get; set; }
     [Parameter]
-    public IList<string> datosValidaciones { get; set; }
+    public IList<Validacion> datosValidaciones { get; set; }
+
+    private Modal_Component? Modal { get; set; }
 
     //Metodo Habilitar Pantalla
     protected override async Task OnInitializedAsync()
@@ -77,8 +81,14 @@
         nombreSubOpcion = (string)_containerValues.Value["nombreSubOpcion"];
         nombreCategoria = (string)_containerValues.Value["nombreCategoria"];
     }
+
     private async Task mostrarDatosValidaciones()
     {
-        datosValidaciones = (IList<string>)_containerValues.Value["datosValidaciones"];
+        datosValidaciones = (IList<Validacion>)_containerValues.Value["datosValidaciones"];
+    }
+
+    private async Task solicitarRepuestaValidaciones()
+    {
+        Modal?.Open();
     }
 }

@@ -27,6 +27,6 @@ namespace DSI.PPAI.IVR.Domain
             return Equals(SubOpcionLlamada.ComunicarseConOperador);
         }
 
-        public IList<string> getValidacionesSubOpcion() => _validacionesRequeridas.Select(x => x.getDatosValidacion()).ToList();
+        public IList<Validacion> getValidacionesSubOpcion() => _validacionesRequeridas;
     }
 }

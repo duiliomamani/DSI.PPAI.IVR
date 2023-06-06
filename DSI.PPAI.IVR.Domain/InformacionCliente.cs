@@ -14,5 +14,12 @@
             _tipoInformacion = tipoInformacion;
             _validacion = validacion;
         }
+        public bool esInformacionCorrecta(Validacion validacion, string datoAValidar) { 
+            if(esValidacion(validacion)){
+                return datoAValidar.Equals(_datoAValidar);
+            }
+            return false;
+        }
+        private bool esValidacion(Validacion validacion) => _validacion.Equals(validacion);
     }
 }

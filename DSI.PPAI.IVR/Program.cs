@@ -5,7 +5,6 @@ using DSI.PPAI.IVR.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using static System.Formats.Asn1.AsnWriter;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -21,17 +20,12 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.DefaultScopes.Add("address");
 });
 
-builder.Services.AddSingleton<ContainerValues>();
-
-var app = builder.Build();
-
 var cliente = new Cliente(41042229, "Duilio", "Mamani", "+543516514522", new List<InformacionCliente>()
 {
     new InformacionCliente("29/05/1998",
     OpcionValidacion.Opcion3,
     TipoInformacion.FechaNacimiento,
-    Validacion.FechaNacimiento)
-,
+    Validacion.FechaNacimiento),
     new InformacionCliente("4610",
     OpcionValidacion.Opcion6,
     TipoInformacion.CodPostal,
@@ -46,11 +40,13 @@ var subOpcion = SubOpcionLlamada.ComunicarseConOperador;
 
 var llamada = new Llamada(cliente, Estado.Iniciada);
 
-var _navigatorManager = app.Services.GetRequiredService<NavigationManager>();
-var _containerValues = app.Services.GetRequiredService<ContainerValues>();
+builder.Services.AddSingleton<ContainerValues>();
+builder.Services.AddSingleton<GestorLlamada>();
 
-var gestor = new GestorLlamada(categoria, opcionSeleccionada, subOpcion, llamada, _navigatorManager, _containerValues);
+var app = builder.Build();
 
-gestor.comunicarseOP();
+var gestor = app.Services.GetService<GestorLlamada>();
+
+gestor.comunicarseOP(categoria, opcionSeleccionada, subOpcion, llamada);
 
 await app.RunAsync();

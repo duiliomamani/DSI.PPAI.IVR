@@ -43,5 +43,10 @@
         public CambioEstado getEstadoActual() {
             return _cambioEstado.Where(x => x.esActual()).First();
         }
+
+        public bool validarDatos(Validacion validacion, string datoAValidar)
+        {
+            return _cliente.validarDatos(validacion, datoAValidar);
+        }
     }
 }

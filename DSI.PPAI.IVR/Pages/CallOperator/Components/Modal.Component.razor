@@ -1,0 +1,81 @@
+﻿@using DSI.PPAI.IVR.Business;
+@using DSI.PPAI.IVR.Domain;
+
+@inject ContainerValues _containerValues;
+@inject GestorLlamada _gestorLlamada;
+
+<div class="modal @ModalClass" tabindex="-1" role="dialog" style="display:@ModalDisplay">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Validaciones</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    @foreach (var i in datosValidaciones)
+                    {
+                        <div class="mb-3">
+                            <label for="@i" class="form-label">@i</label>
+                            <input type="text" class="form-control" id="@i" @bind-value="@validaciones[i]">
+                        </div>
+                    }
+                    @if (resultadoValidaciones.Any())
+                    {
+                        @foreach (var v in resultadoValidaciones.Where(x => !x.Value))
+                        {
+                            <span class="badge bg-danger">Revisar @v.Key</span>
+                        }
+                    }
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="() => tomarRepuestaDeValidaciones()">Validar datos</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (ShowBackdrop)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+
+@code {
+    [Parameter]
+    public IList<Validacion> datosValidaciones { get; set; } = new List<Validacion>();
+    public Dictionary<Validacion, string> validaciones { get; set; } = new Dictionary<Validacion, string>();
+    public Guid Guid = Guid.NewGuid();
+    public string ModalDisplay = "none;";
+    public string ModalClass = "";
+    public bool ShowBackdrop = false;
+
+    public Dictionary<string, bool> resultadoValidaciones { get; set; } = new();
+
+    public void Open()
+    {
+        datosValidaciones = (IList<Validacion>)_containerValues.Value["datosValidaciones"];
+        foreach (var d in datosValidaciones)
+            validaciones.Add(d, null);
+
+        ModalDisplay = "block;";
+        ModalClass = "show";
+        ShowBackdrop = true;
+        StateHasChanged();
+    }
+
+    private void tomarRepuestaDeValidaciones()
+    {
+        resultadoValidaciones = _gestorLlamada.tomarRespuesta(validaciones);
+    }
+
+    public void Close()
+    {
+        ModalDisplay = "none";
+        ModalClass = "";
+        ShowBackdrop = false;
+        StateHasChanged();
+    }
+}
