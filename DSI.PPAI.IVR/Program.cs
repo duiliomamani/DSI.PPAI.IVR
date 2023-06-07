@@ -1,3 +1,4 @@
+using CurrieTechnologies.Razor.SweetAlert2;
 using DSI.PPAI.IVR;
 using DSI.PPAI.IVR.Business;
 using DSI.PPAI.IVR.Domain;
@@ -42,10 +43,11 @@ var llamada = new Llamada(cliente, Estado.Iniciada);
 
 builder.Services.AddSingleton<ContainerValues>();
 builder.Services.AddSingleton<GestorLlamada>();
+builder.Services.AddSweetAlert2();
 
 var app = builder.Build();
 
-var gestor = app.Services.GetService<GestorLlamada>();
+var gestor = app.Services.GetRequiredService<GestorLlamada>();
 
 gestor.comunicarseOP(categoria, opcionSeleccionada, subOpcion, llamada);
 

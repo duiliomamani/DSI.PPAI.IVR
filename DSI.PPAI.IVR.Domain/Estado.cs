@@ -17,5 +17,10 @@ namespace DSI.PPAI.IVR.Domain
         {
             return Equals(EnCurso);
         }
+
+        public bool esFinalizada()
+        {
+            return Equals(Finalizada);
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace DSI.PPAI.IVR.Domain
             _validacionesRequeridas = validaciones;
         }
 
-        public string getNombreSubopcion() => base.getDescripcion();
+        public string getNombreSubopcionLlamada() => base.getDescripcion();
 
         public bool esComunicarConOperador()
         {

@@ -20,6 +20,8 @@
 
         public string getNombreEstado() => _estado.getDescripcion();
         public bool esActual() => !_fechaHoraFin.HasValue;
-        public void setFechaHoraFin() => _fechaHoraFin = DateTime.Now;
+        public void setFechaHoraFin(DateTime fechaFinalizada) => _fechaHoraFin = fechaFinalizada;
+
+        public DateTime getFechaHoraInicio() => _fechaHoraInicio;
     }
 }

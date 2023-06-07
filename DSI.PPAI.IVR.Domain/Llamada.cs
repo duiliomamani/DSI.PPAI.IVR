@@ -18,10 +18,10 @@
         public Llamada(Cliente cliente, Estado estado)
         {
             _cliente = cliente;
-            crearNvoCambioEstado(estado);
+            crearNvoCambioEstado(estado, DateTime.Now);
         }
 
-        public void crearNvoCambioEstado(Estado estado)
+        public void crearNvoCambioEstado(Estado estado, DateTime fechaActual)
         {
             _cambioEstado ??= new List<CambioEstado>();
 
@@ -29,10 +29,10 @@
             {
                 var estadoActual = getEstadoActual();
 
-                estadoActual.setFechaHoraFin();
+                estadoActual.setFechaHoraFin(fechaActual);
             }
 
-            _cambioEstado.Add(new CambioEstado(fechaHoraInicio: DateTime.Now, estado: estado));
+            _cambioEstado.Add(new CambioEstado(fechaHoraInicio: fechaActual, estado: estado));
         }
 
         public string getDatosLlamada()
@@ -47,6 +47,36 @@
         public bool validarDatos(Validacion validacion, string datoAValidar)
         {
             return _cliente.validarDatos(validacion, datoAValidar);
+        }
+
+        private void setDescripcionRtaOperador(string descripcionOperador) => _descripcionOperador = descripcionOperador;
+
+        private void setSubOpcionLlamada(SubOpcionLlamada subOpcionLlamada) => _subOpcionSeleccionada = subOpcionLlamada;
+        private void setOpcionLlamada(OpcionLlamada opcionLlamada) => _opcionSeleccionada = opcionLlamada;
+        private void setDuracion()
+        {
+            var fechaInicio = _cambioEstado.Min(x => x.getFechaHoraInicio());
+
+            var fechaFin = _cambioEstado.Max(x => x.getFechaHoraInicio());
+
+            _duracion = (fechaInicio - fechaFin).TotalMinutes;
+        }
+
+        public void finalizarLlamada(DateTime fechaActual, 
+            SubOpcionLlamada subOpcionLlamada,
+            OpcionLlamada opcionLlamada, 
+            string descripcionOperador,
+            Estado estadoFinalizado)
+        {
+            setDescripcionRtaOperador(descripcionOperador);
+
+            setSubOpcionLlamada(subOpcionLlamada);
+
+            setOpcionLlamada(opcionLlamada);
+
+            crearNvoCambioEstado(estadoFinalizado, fechaActual);
+
+            setDuracion();
         }
     }
 }

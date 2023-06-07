@@ -1,36 +1,69 @@
-﻿@using DSI.PPAI.IVR.Business;
+﻿@using CurrieTechnologies.Razor.SweetAlert2;
+@using DSI.PPAI.IVR.Business;
 @using DSI.PPAI.IVR.Domain;
 
 @inject ContainerValues _containerValues;
 @inject GestorLlamada _gestorLlamada;
+@inject SweetAlertService Swal;
 
 <div class="modal @ModalClass" tabindex="-1" role="dialog" style="display:@ModalDisplay">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Validaciones</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="() => Close()"></button>
             </div>
             <div class="modal-body">
-                <form>
-                    @foreach (var i in datosValidaciones)
-                    {
-                        <div class="mb-3">
-                            <label for="@i" class="form-label">@i</label>
-                            <input type="text" class="form-control" id="@i" @bind-value="@validaciones[i]">
-                        </div>
-                    }
-                    @if (resultadoValidaciones.Any())
-                    {
-                        @foreach (var v in resultadoValidaciones.Where(x => !x.Value))
+                <form class="container-fluid">
+                    <div class="row g-3">
+                        @foreach (var i in datosValidaciones)
                         {
-                            <span class="badge bg-danger">Revisar @v.Key</span>
+                            <div class="col-md-12">
+                                <label for="txtboxRespuestaValidaciones-@i" class="form-label">@i</label>
+                                <input type="text" class="form-control
+                                @((resultadoValidaciones.Any(x => x.Value && x.Key == i.getDescripcion())) ? "is-valid" : "")
+                                @(resultadoValidaciones.Any(x => !x.Value && x.Key == i.getDescripcion()) ? "is-invalid" :"")" id="txtboxRespuestaValidaciones-@i" @bind-value="@validaciones[i]">
+                                @if (resultadoValidaciones.Any(x => !x.Value && x.Key == i.getDescripcion()))
+                                {
+                                    <div class="invalid-feedback">Please provide a valid @i.getDescripcion()</div>
+                                }
+                                @if (resultadoValidaciones.Any(x => x.Value && x.Key == i.getDescripcion()))
+                                {
+                                    <div class="valid-feedback">Looks good @i.getDescripcion()</div>
+                                }
+                            </div>
                         }
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary" @onclick="() => tomarRepuestaDeValidaciones()">Validar datos</button>
+                        </div>
+                    </div>
+                </form>
+                <form class="container-fluid mt-3">
+                    @if (resultadoValidaciones.Any() && resultadoValidaciones.All(x => x.Value))
+                    {
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="txtboxDescripcionDeRta" class="form-label">Descripcion respuesta operador</label>
+                                <input type="text" class="form-control" id="txtboxDescripcionDeRta" @bind-value="respuestaOperador" @onkeyup="() => tomarDescripcionRespuesta()">
+                            </div>
+                            @if (acciones.Any())
+                            {
+                                <div class="col-md-12">
+                                    <select id="cboxAccion" class="form-control" @bind="@accionSeleccionada" @onselect="()=> tomarAccion()">
+                                        <option value="">Seleccione una accion requerida</option>
+                                        @foreach (var a in acciones)
+                                        {
+                                            <option value="@a.getDescripcion()"> @a.getDescripcion() </option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                        </div>
                     }
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" @onclick="() => tomarRepuestaDeValidaciones()">Validar datos</button>
+                <button id="btnConfirmacionDeOperacion" type="button" class="btn btn-primary" @onclick="() => tomarConfirmacionDeOperacion()">Confirmar operación</button>
             </div>
         </div>
     </div>
@@ -46,7 +79,14 @@
 @code {
     [Parameter]
     public IList<Validacion> datosValidaciones { get; set; } = new List<Validacion>();
-    public Dictionary<Validacion, string> validaciones { get; set; } = new Dictionary<Validacion, string>();
+    public Dictionary<Validacion, string> validaciones { get; set; } = new();
+
+    public string respuestaOperador { get; set; }
+
+    public string accionSeleccionada { get; set; }
+
+    public IList<Accion> acciones { get; set; } = new List<Accion>();
+
     public Guid Guid = Guid.NewGuid();
     public string ModalDisplay = "none;";
     public string ModalClass = "";
@@ -56,6 +96,11 @@
 
     public void Open()
     {
+        resultadoValidaciones.Clear();
+        validaciones.Clear();
+        respuestaOperador = string.Empty;
+        accionSeleccionada = string.Empty;
+
         datosValidaciones = (IList<Validacion>)_containerValues.Value["datosValidaciones"];
         foreach (var d in datosValidaciones)
             validaciones.Add(d, null);
@@ -69,8 +114,45 @@
     private void tomarRepuestaDeValidaciones()
     {
         resultadoValidaciones = _gestorLlamada.tomarRespuesta(validaciones);
+
+        acciones = _gestorLlamada.buscarAccion();
+    }
+    private void tomarDescripcionRespuesta()
+    {
+        _gestorLlamada.tomarDescripcionRespuesta(respuestaOperador);
     }
 
+    private void tomarAccion()
+    {
+        _gestorLlamada.tomarAccion(accionSeleccionada);
+    }
+
+    private async Task tomarConfirmacionDeOperacion()
+    {
+        var result = _gestorLlamada.tomarConfirmacionDeOperacion();
+        if (result)
+            await Swal.FireAsync(
+           "Success",
+           "Operation executed successful",
+           SweetAlertIcon.Success
+           ).ContinueWith(swalTask =>
+     {
+         SweetAlertResult result = swalTask.Result;
+         if (!string.IsNullOrEmpty(result.Value))
+             Close();
+     });
+        else
+            await Swal.FireAsync(
+           "Cancelled",
+           "CU28 executed failed",
+           SweetAlertIcon.Error
+           ).ContinueWith(swalTask =>
+     {
+         SweetAlertResult result = swalTask.Result;
+         if (!string.IsNullOrEmpty(result.Value))
+             Close();
+     });
+    }
     public void Close()
     {
         ModalDisplay = "none";

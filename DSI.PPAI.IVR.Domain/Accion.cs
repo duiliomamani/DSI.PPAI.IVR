@@ -1,16 +1,19 @@
-﻿namespace DSI.PPAI.IVR.Domain
+﻿using DSI.PPAI.IVR.Domain.BaseTypes;
+
+namespace DSI.PPAI.IVR.Domain
 {
-    public class Accion
+    public class Accion : BaseEnum<Accion>
     {
-        //Variables
-        private string _descripcion;
-
-        public Accion(string descripcion)
+        public static readonly Accion Accion1 = new ("Comunicar un saldo");
+        public static readonly Accion Accion2 = new ("Dar baja una tarjeta");
+        public static readonly Accion Accion3 = new ("Denunciar robo");
+        public Accion() : base()
         {
-            _descripcion = descripcion;
-        }
 
-        //Methods
-        public string Descripcion => _descripcion;
+        }
+        public Accion(string descripcion) : base(descripcion)
+        {
+
+        }
     }
 }

@@ -37,7 +37,7 @@
                             </ul>
                             <div class="card-footer">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <button type="button" class="btn btn-outline-dark" @onclick="() =>solicitarRepuestaValidaciones()">Tomar datos</button>
+                                    <button type="button" class="btn btn-outline-dark" @onclick="() =>solicitarRespuestaValidaciones()">Tomar datos</button>
                                 </div>
                             </div>
                         </div>
@@ -87,7 +87,7 @@
         datosValidaciones = (IList<Validacion>)_containerValues.Value["datosValidaciones"];
     }
 
-    private async Task solicitarRepuestaValidaciones()
+    private async Task solicitarRespuestaValidaciones()
     {
         Modal?.Open();
     }
