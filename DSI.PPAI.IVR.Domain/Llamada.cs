@@ -53,6 +53,8 @@
 
         private void setSubOpcionLlamada(SubOpcionLlamada subOpcionLlamada) => _subOpcionSeleccionada = subOpcionLlamada;
         private void setOpcionLlamada(OpcionLlamada opcionLlamada) => _opcionSeleccionada = opcionLlamada;
+
+        //Seteo la duracion dependiendo el minimo y maximo de las fechas inicio
         private void setDuracion()
         {
             var fechaInicio = _cambioEstado.Min(x => x.getFechaHoraInicio());
@@ -62,6 +64,8 @@
             _duracion = (fechaInicio - fechaFin).TotalMinutes;
         }
 
+
+        //Realizo las acciones finalizar llamada
         public void finalizarLlamada(DateTime fechaActual, 
             SubOpcionLlamada subOpcionLlamada,
             OpcionLlamada opcionLlamada, 

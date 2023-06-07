@@ -28,6 +28,7 @@ namespace DSI.PPAI.IVR.Business
             _containerValues = containerValues;
         }
 
+        //Comunicarse con Operacdor
         public void comunicarseOP(CategoriaLlamada categoriaLlamada,
             OpcionLlamada opcionLlamada,
             SubOpcionLlamada subOpcionLlamada,
@@ -60,29 +61,39 @@ namespace DSI.PPAI.IVR.Business
                 _containerValues.SetValue("nombreCategoria", nombreCategoria);
                 _containerValues.SetValue("datosValidaciones", datosValidaciones);
 
+
+                //Redirijo a la pantalla del operador
                 _navigationManager.NavigateTo("/operator/call");
             }
             return;
         }
 
+
+        //Identifica la opcion si es comunicarse con operador
         private bool identificarOpcion()
         {
             return _opcionLlamada.esComunicarConOperador() || _subOpcionLlamada.esComunicarConOperador();
         }
+
+        //Fecha Hora Actual
         private DateTime getFechaHoraActual()
         {
             return DateTime.Now;
         }
 
+        //Busco referencia al estado en curso
         private Estado buscarEstadoEnCurso()
         {
             return _estados.Where(x => x.esEnCurso()).First();
         }
+
+        //buscar validaciones correspondientes a la subopcion
         private IList<Validacion> buscarValidaciones()
         {
             return _subOpcionLlamada.getValidacionesSubOpcion();
         }
 
+        //Validamos todos los datos con la validacion correspondiente
         private Dictionary<string, bool> validarDatos(Dictionary<Validacion, string> respuestas)
         {
             Dictionary<string, bool> validaciones = new Dictionary<string, bool>();
@@ -92,25 +103,32 @@ namespace DSI.PPAI.IVR.Business
             }
             return validaciones;
         }
+
+        //Voy guardando parcialmente las respuestas del cliente ingresadas por el operador
         public Dictionary<string, bool> tomarRespuesta(Dictionary<Validacion, string> respuestas)
         {
             return validarDatos(respuestas);
         }
 
+        //Guardo la respuesta del operador
         public void tomarDescripcionRespuesta(string respuestaOperador)
         {
             _respuestaOperador = respuestaOperador;
         }
 
+        //busco acciones para registrar en la llamada
         public IList<Accion> buscarAccion()
         {
             return _acciones;
         }
 
+        //Guardo la accion seleccionada
         public void tomarAccion(string accion)
         {
             _accionRequerida = accion;
         }
+
+        //Confirmo la operacion y procedo a finalizar la llamada
         public bool tomarConfirmacionDeOperacion()
         {
             var estado = buscarEstadoFinalizado();
@@ -127,11 +145,13 @@ namespace DSI.PPAI.IVR.Business
 
             return true;
         }
+        //busco el estado finalizado
         private Estado buscarEstadoFinalizado()
         {
             return _estados.Where(x => x.esFinalizada()).First();
         }
 
+        //Llamar al CU28 ejecuto un random de booleans
         private bool LlamarCU28()
         {
             var random = new Random();

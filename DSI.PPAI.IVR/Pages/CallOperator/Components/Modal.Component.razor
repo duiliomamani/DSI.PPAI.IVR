@@ -62,9 +62,12 @@
                     }
                 </form>
             </div>
-            <div class="modal-footer">
-                <button id="btnConfirmacionDeOperacion" type="button" class="btn btn-primary" @onclick="() => tomarConfirmacionDeOperacion()">Confirmar operación</button>
-            </div>
+            @if (resultadoValidaciones.Any() && resultadoValidaciones.All(x => x.Value))
+            {
+                <div class="modal-footer">
+                    <button id="btnConfirmacionDeOperacion" type="button" class="btn btn-primary" @onclick="() => tomarConfirmacionDeOperacion()">Confirmar operación</button>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -146,12 +149,7 @@
            "Cancelled",
            "CU28 executed failed",
            SweetAlertIcon.Error
-           ).ContinueWith(swalTask =>
-     {
-         SweetAlertResult result = swalTask.Result;
-         if (!string.IsNullOrEmpty(result.Value))
-             Close();
-     });
+           );
     }
     public void Close()
     {

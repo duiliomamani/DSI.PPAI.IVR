@@ -14,6 +14,8 @@
             _tipoInformacion = tipoInformacion;
             _validacion = validacion;
         }
+
+        //Verifica si la informacion que dicto el cliente es valida y corresponde a la validacion
         public bool esInformacionCorrecta(Validacion validacion, string datoAValidar) { 
             if(esValidacion(validacion)){
                 return datoAValidar.Equals(_datoAValidar);

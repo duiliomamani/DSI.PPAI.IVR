@@ -21,6 +21,7 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.DefaultScopes.Add("address");
 });
 
+//Inicializamos un Cliente que ya anteriormente llamo para simular que se comunica con el operador
 var cliente = new Cliente(41042229, "Duilio", "Mamani", "+543516514522", new List<InformacionCliente>()
 {
     new InformacionCliente("29/05/1998",
